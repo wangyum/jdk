@@ -2851,8 +2851,12 @@ JNI_END
 
 JNI_ENTRY(void, jni_ReleasePrimitiveArrayCritical(JNIEnv *env, jarray array, void *carray, jint mode))
   HOTSPOT_JNI_RELEASEPRIMITIVEARRAYCRITICAL_ENTRY(env, array, carray, mode);
+
+  // Use Handle to ensure we unpin the correct object even if it moved
+  Handle a(thread, JNIHandles::resolve_non_null(array));
+
   // Unpin object
-  Universe::heap()->unpin_object(thread, JNIHandles::resolve_non_null(array));
+  Universe::heap()->unpin_object(thread, a());
 HOTSPOT_JNI_RELEASEPRIMITIVEARRAYCRITICAL_RETURN();
 JNI_END
 
